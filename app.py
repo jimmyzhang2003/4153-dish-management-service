@@ -3,7 +3,13 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 # In-memory storage for dishes (this would typically be a database)
-dishes = []
+dishes = [{
+    "id": 1,
+    "name": "Pizza",
+    "description": "Cheese and tomato pizza",
+    "category": "Main Course",
+    "dietary_info": "Vegetarian"
+}]
 next_id = 1
 
 # Dish structure example:
@@ -64,4 +70,4 @@ def delete_dish(id):
     return jsonify({"message": "Dish deleted"}), 200
 
 if __name__ == '__main__':
-    app.run(debug=True)
+   app.run(host='0.0.0.0', port=5000)
