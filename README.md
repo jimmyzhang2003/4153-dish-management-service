@@ -11,7 +11,8 @@ This is a Flask-based microservice that connects to a MySQL database and provide
 
 ## Prerequisites
 
-- Python 3.10.1
+- Python 3.10 (for local development)
+- Docker (for containerized development)
 - MySQL Server
 - `pip` for dependency management
 - libraries in `requirements.txt`
@@ -55,4 +56,15 @@ This is a Flask-based microservice that connects to a MySQL database and provide
 5. **Run the Microservice**
     ```bash
     python3 app.py
+    ```
+## Docker Instructions
+
+1. **Build the Docker Image**
+    ```bash
+    docker build -t 4153-dish-management-service .
+    ```
+
+2. **Run the Docker Container (if connecting to localhost database, set DB_HOST=host.docker.internal)**
+    ```bash
+    docker run -p 5001:5001 --env-file .env 4153-dish-management-service
     ```
