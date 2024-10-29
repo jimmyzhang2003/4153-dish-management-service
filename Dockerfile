@@ -1,5 +1,5 @@
-# Use the Python 3.12 slim image as the base image
-FROM python:3.12-slim
+# Use the Python 3.10 slim image as the base image
+FROM python:3.10-slim
 
 # Set the working directory within the container to be /app
 WORKDIR /app

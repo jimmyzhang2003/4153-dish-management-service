@@ -1,4 +1,6 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
+from flasgger import Swagger
 import mysql.connector
 from dotenv import load_dotenv
 import os
@@ -9,7 +11,23 @@ import os
 # Load environment variables
 load_dotenv()
 
+# Create Flask app
 app = Flask(__name__)
+CORS(app)
+
+# Create Swagger documentation
+template = {
+  "swagger": "2.0",
+  "info": {
+    "title": "Dish Management Service",
+    "version": "0.0.1"
+  },
+  "host": "localhost:5001", 
+  "schemes": [
+    "http",
+  ],
+}
+swagger = Swagger(app, template=template)
 
 # Connect to MySQL database
 db = mysql.connector.connect(
@@ -22,6 +40,52 @@ db = mysql.connector.connect(
 # POST /dishes: Add a new dish
 @app.route('/dishes', methods=['POST'])
 def add_dish():
+    """
+    Add a new dish.
+    ---
+    tags:
+      - Dishes
+    parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+          required:
+            - name
+            - description
+            - category
+            - dietary_info
+          properties:
+            name:
+              type: string
+              description: The name of the dish
+            description:
+              type: string
+              description: A description of the dish
+            category:
+              type: string
+              description: The category of the dish (e.g., appetizer, main course)
+            dietary_info:
+              type: string
+              description: Dietary information (e.g., vegan, gluten-free)
+    responses:
+      201:
+        description: Dish successfully created
+        schema:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: The ID of the new dish
+            name:
+              type: string
+            description:
+              type: string
+            category:
+              type: string
+            dietary_info:
+              type: string
+    """
     new_dish = request.json
     cursor = db.cursor()
     cursor.execute("INSERT INTO dishes (name, description, category, dietary_info) VALUES (%s, %s, %s, %s)", 
@@ -34,6 +98,41 @@ def add_dish():
 # GET /dishes: Retrieve a list of all dishes (with filtering capabilities)
 @app.route('/dishes', methods=['GET'])
 def get_dishes():
+    """
+    Retrieve a list of all dishes.
+    ---
+    tags:
+      - Dishes
+    parameters:
+      - in: query
+        name: name
+        type: string
+        required: false
+        description: Filter dishes by name (partial matches allowed)
+      - in: query
+        name: category
+        type: string
+        required: false
+        description: Filter dishes by category
+    responses:
+      200:
+        description: List of filtered dishes
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              description:
+                type: string
+              category:
+                type: string
+              dietary_info:
+                type: string
+    """
     name_filter = request.args.get('name')
     category_filter = request.args.get('category')
 
@@ -57,6 +156,36 @@ def get_dishes():
 # GET /dishes/{id}: Retrieve detailed information about a specific dish
 @app.route('/dishes/<int:id>', methods=['GET'])
 def get_dish(id):
+    """
+    Retrieve detailed information about a specific dish.
+    ---
+    tags:
+      - Dishes
+    parameters:
+      - in: path
+        name: id
+        type: integer
+        required: true
+        description: The ID of the dish
+    responses:
+      200:
+        description: Details of the specified dish
+        schema:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            description:
+              type: string
+            category:
+              type: string
+            dietary_info:
+              type: string
+      404:
+        description: Dish not found
+    """
     cursor = db.cursor(dictionary=True)
     cursor.execute("SELECT * FROM dishes WHERE id = %s", (id, ))
     dish = cursor.fetchone()
@@ -68,6 +197,42 @@ def get_dish(id):
 # PUT /dishes/{id}: Update details of an existing dish
 @app.route('/dishes/<int:id>', methods=['PUT'])
 def update_dish(id):
+    """
+    Update details of an existing dish.
+    ---
+    tags:
+      - Dishes
+    parameters:
+      - in: path
+        name: id
+        type: integer
+        required: true
+        description: The ID of the dish
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            category:
+              type: string
+            dietary_info:
+              type: string
+    responses:
+      200:
+        description: Dish updated successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Dish updated
+      400:
+        description: No fields provided to update
+    """
     updated_data = request.json
     cursor = db.cursor()
 
@@ -107,6 +272,27 @@ def update_dish(id):
 # DELETE /dishes/{id}: Delete a dish
 @app.route('/dishes/<int:id>', methods=['DELETE'])
 def delete_dish(id):
+    """
+    Delete a dish.
+    ---
+    tags:
+      - Dishes
+    parameters:
+      - in: path
+        name: id
+        type: integer
+        required: true
+        description: The ID of the dish
+    responses:
+      200:
+        description: Dish deleted successfully
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Dish deleted
+    """
     cursor = db.cursor()
     cursor.execute("DELETE FROM dishes WHERE id=%s", (id, ))
     db.commit()
