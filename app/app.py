@@ -1,4 +1,6 @@
-from flask import Flask, request, redirect, jsonify
+import logging
+from datetime import datetime
+from flask import Flask, request, redirect, jsonify, g
 from flask_cors import CORS
 from flasgger import Swagger
 from flask_marshmallow import Marshmallow
@@ -53,6 +55,25 @@ template = {
   ],
 }
 swagger = Swagger(app, template=template)
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Middleware logging before each request
+@app.before_request
+def before_request_logging():
+    g.start_time = datetime.now()
+    logger.info(f"Incoming {request.method} request to {request.path} with data: {request.args.to_dict()}")
+
+# Middleware logging after each request
+@app.after_request
+def after_request_logging(response):
+    duration = datetime.now() - g.start_time
+    logger.info(f"Completed {request.method} request to {request.path} in {duration.total_seconds()} seconds with status code {response.status_code}")
+    return response
+
+# -----------------------------------------------------------
 
 # GET /: Redirect to Swagger page
 @app.route('/', methods=['GET'])
