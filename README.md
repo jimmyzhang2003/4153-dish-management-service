@@ -38,9 +38,11 @@ This is a Flask-based microservice that connects to a MySQL database and provide
    Create a `.env` file in the root directory with the following variables:
 
    ```env
-   DB_HOST=your-database-host
+   DB_ENGINE=your-database-engine
    DB_USER=your-database-username
    DB_PASSWORD=your-database-password
+   DB_HOST=your-database-host
+   DB_PORT=your-database-port
    DB_NAME=your-database-name
    ```
 

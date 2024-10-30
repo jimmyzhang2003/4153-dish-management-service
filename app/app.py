@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, jsonify, url_for
+from flask import Flask, request, redirect, jsonify
 from flask_cors import CORS
 from flasgger import Swagger
 from flask_marshmallow import Marshmallow
