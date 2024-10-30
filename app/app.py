@@ -84,18 +84,30 @@ def add_dish():
             name:
               type: string
               description: The name of the dish
+              example: "Spaghetti Carbonara"
             description:
               type: string
               description: Description of the dish
+              example: "Classic Italian pasta with egg, cheese, pancetta, and pepper."
             category:
               type: string
               description: The category of the dish
+              example: "Pasta"
             dietary_info:
               type: string
               description: Dietary information
+              example: "Contains dairy and gluten"
     responses:
       201:
         description: Dish added
+        schema:
+          properties:
+            id:
+              type: integer
+              example: 1
+            message:
+              type: string
+              example: "Dish added"
       400:
         description: Invalid input
     """
@@ -123,13 +135,34 @@ def get_dishes():
         in: query
         type: string
         description: Filter by name
+        example: "Spaghetti"
       - name: category
         in: query
         type: string
         description: Filter by category
+        example: "Pasta"
     responses:
       200:
         description: A list of dishes
+        schema:
+          type: array
+          items:
+            properties:
+              id:
+                type: integer
+                example: 1
+              name:
+                type: string
+                example: "Spaghetti Carbonara"
+              description:
+                type: string
+                example: "Classic Italian pasta with egg, cheese, pancetta, and pepper."
+              category:
+                type: string
+                example: "Pasta"
+              dietary_info:
+                type: string
+                example: "Contains dairy and gluten"
     """
     name_filter = request.args.get('name')
     category_filter = request.args.get('category')
@@ -157,9 +190,27 @@ def get_dish(id):
         required: true
         type: integer
         description: ID of the dish
+        example: 1
     responses:
       200:
         description: A dish
+        schema:
+          properties:
+            id:
+              type: integer
+              example: 1
+            name:
+              type: string
+              example: "Spaghetti Carbonara"
+            description:
+              type: string
+              example: "Classic Italian pasta with egg, cheese, pancetta, and pepper."
+            category:
+              type: string
+              example: "Pasta"
+            dietary_info:
+              type: string
+              example: "Contains dairy and gluten"
       404:
         description: Dish not found
     """
@@ -182,6 +233,7 @@ def update_dish(id):
         required: true
         type: integer
         description: ID of the dish
+        example: 1
       - name: body
         in: body
         required: true
@@ -189,15 +241,24 @@ def update_dish(id):
           properties:
             name:
               type: string
+              example: "Spaghetti Bolognese"
             description:
               type: string
+              example: "Pasta with ground beef in a tomato sauce."
             category:
               type: string
+              example: "Pasta"
             dietary_info:
               type: string
+              example: "Contains gluten"
     responses:
       200:
         description: Dish updated
+        schema:
+          properties:
+            message:
+              type: string
+              example: "Dish updated"
       404:
         description: Dish not found
     """
@@ -230,9 +291,15 @@ def delete_dish(id):
         required: true
         type: integer
         description: ID of the dish
+        example: 1
     responses:
       200:
         description: Dish deleted
+        schema:
+          properties:
+            message:
+              type: string
+              example: "Dish deleted"
       404:
         description: Dish not found
     """
