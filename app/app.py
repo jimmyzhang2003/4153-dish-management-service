@@ -184,6 +184,21 @@ def get_dishes():
               dietary_info:
                 type: string
                 example: "Contains dairy and gluten"
+              _links:
+                type: object
+                properties:
+                  collection:
+                    type: string
+                    example: "/api/v1/dishes"
+                  self:
+                    type: string
+                    example: "/api/v1/dishes/{id}"
+                  delete:
+                    type: string
+                    example: "/api/v1/dishes/{id}"
+                  update:
+                    type: string
+                    example: "/api/v1/dishes/{id}"
     """
     name_filter = request.args.get('name')
     category_filter = request.args.get('category')
@@ -232,6 +247,21 @@ def get_dish(id):
             dietary_info:
               type: string
               example: "Contains dairy and gluten"
+            _links:
+              type: object
+              properties:
+                collection:
+                  type: string
+                  example: "/api/v1/dishes"
+                self:
+                  type: string
+                  example: "/api/v1/dishes/{id}"
+                delete:
+                  type: string
+                  example: "/api/v1/dishes/{id}"
+                update:
+                  type: string
+                  example: "/api/v1/dishes/{id}"
       404:
         description: Dish not found
     """
