@@ -57,16 +57,48 @@ swagger = Swagger(app, template=template)
 # GET /: Redirect to Swagger page
 @app.route('/', methods=['GET'])
 def root():
-    return redirect("/apidocs", code = 302)
+    return redirect("/apidocs", code=302)
 
 # GET /api/v1/: Redirect to Swagger page
 @app.route('/api/v1/', methods=['GET'])
 def api_root():
-    return redirect("/apidocs", code = 302)
+    return redirect("/apidocs", code=302)
 
 # POST /api/v1/dishes: Add a new dish
 @app.route('/api/v1/dishes', methods=['POST'])
 def add_dish():
+    """
+    Add a new dish
+    ---
+    tags:
+      - Dishes
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          id: Dish
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              description: The name of the dish
+            description:
+              type: string
+              description: Description of the dish
+            category:
+              type: string
+              description: The category of the dish
+            dietary_info:
+              type: string
+              description: Dietary information
+    responses:
+      201:
+        description: Dish added
+      400:
+        description: Invalid input
+    """
     new_dish_data = request.json
     new_dish = Dish(
         name=new_dish_data['name'],
@@ -78,41 +110,101 @@ def add_dish():
     db.session.commit()
     return jsonify({"id": new_dish.id, "message": "Dish added"}), 201
 
-# GET /api/v1/dishes: Retrieve a list of all dishes (with filtering capabilities)
+# GET /api/v1/dishes: Retrieve a list of all dishes
 @app.route('/api/v1/dishes', methods=['GET'])
 def get_dishes():
+    """
+    Retrieve a list of all dishes
+    ---
+    tags:
+      - Dishes
+    parameters:
+      - name: name
+        in: query
+        type: string
+        description: Filter by name
+      - name: category
+        in: query
+        type: string
+        description: Filter by category
+    responses:
+      200:
+        description: A list of dishes
+    """
     name_filter = request.args.get('name')
     category_filter = request.args.get('category')
 
     query = db.session.query(Dish)
-    
     if name_filter:
         query = query.filter(Dish.name.like(f"%{name_filter}%"))
-    
     if category_filter:
         query = query.filter(Dish.category == category_filter)
     
     dishes = query.all()
     return dishes_schema.jsonify(dishes), 200
 
-# GET /api/v1/dishes/{id}: Retrieve detailed information about a specific dish
+# GET /api/v1/dishes/{id}: Retrieve dish details
 @app.route('/api/v1/dishes/<int:id>', methods=['GET'])
 def get_dish(id):
+    """
+    Retrieve detailed information about a specific dish
+    ---
+    tags:
+      - Dishes
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        description: ID of the dish
+    responses:
+      200:
+        description: A dish
+      404:
+        description: Dish not found
+    """
     dish = db.session.query(Dish).get(id)
     if not dish:
         return jsonify({"error": "Dish not found"}), 404
-
     return dish_schema.jsonify(dish), 200
 
-# PUT /api/v1/dishes/{id}: Update details of an existing dish
+# PUT /api/v1/dishes/{id}: Update dish details
 @app.route('/api/v1/dishes/<int:id>', methods=['PUT'])
 def update_dish(id):
+    """
+    Update details of an existing dish
+    ---
+    tags:
+      - Dishes
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        description: ID of the dish
+      - name: body
+        in: body
+        required: true
+        schema:
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            category:
+              type: string
+            dietary_info:
+              type: string
+    responses:
+      200:
+        description: Dish updated
+      404:
+        description: Dish not found
+    """
     updated_data = request.json
     dish = db.session.query(Dish).get(id)
-    
     if not dish:
         return jsonify({"error": "Dish not found"}), 404
-
     if 'name' in updated_data:
         dish.name = updated_data['name']
     if 'description' in updated_data:
@@ -121,17 +213,32 @@ def update_dish(id):
         dish.category = updated_data['category']
     if 'dietary_info' in updated_data:
         dish.dietary_info = updated_data['dietary_info']
-
     db.session.commit()
     return jsonify({"message": "Dish updated"}), 200
 
 # DELETE /api/v1/dishes/{id}: Delete a dish
 @app.route('/api/v1/dishes/<int:id>', methods=['DELETE'])
 def delete_dish(id):
+    """
+    Delete a dish
+    ---
+    tags:
+      - Dishes
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        description: ID of the dish
+    responses:
+      200:
+        description: Dish deleted
+      404:
+        description: Dish not found
+    """
     dish = db.session.query(Dish).get(id)
     if not dish:
         return jsonify({"error": "Dish not found"}), 404
-
     db.session.delete(dish)
     db.session.commit()
     return jsonify({"message": "Dish deleted"}), 200
