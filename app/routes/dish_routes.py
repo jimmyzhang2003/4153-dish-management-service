@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from models import Dish, DiningHall, db
+from models import Dish, DiningHall, Station, db
 from schemas import DishSchema
 
 # register blueprint and create schemas
@@ -23,6 +23,8 @@ def add_dish():
           id: Dish
           required:
             - name
+            - dining_hall_id
+            - station_id
           properties:
             name:
               type: string
@@ -32,14 +34,14 @@ def add_dish():
               type: string
               description: Description of the dish
               example: "Classic Italian pasta with egg, cheese, pancetta, and pepper."
-            category:
-              type: string
-              description: The category of the dish
-              example: "Pasta"
-            dietary_info:
-              type: string
-              description: Dietary information
-              example: "Contains dairy and gluten"
+            dining_hall_id:
+              type: integer
+              description: The id of the dining hall
+              example: 2
+            station_id:
+              type: integer
+              description: The id of the station
+              example: 10
     responses:
       201:
         description: Dish added
@@ -53,18 +55,33 @@ def add_dish():
               example: "Dish added"
       400:
         description: Invalid input
+      409:
+        description: Dish with the same name already exists for this dining hall and station
     """
     data = request.json
+    name = data.get('name')
     dining_hall_id = data.get('dining_hall_id')
+    station_id = data.get('station_id')
 
-    # if the dining_hall_id does not exist
-    dining_hall = DiningHall.query.filter_by(id=dining_hall_id).first()
+    # Validate dining hall and station
+    dining_hall = DiningHall.query.get(dining_hall_id)
     if not dining_hall:
         return jsonify({"error": "Invalid dining_hall_id"}), 400
-    
+
+    station = Station.query.get(station_id)
+    if not station or station.dining_hall_id != dining_hall_id:
+        return jsonify({"error": "Invalid station_id for this dining hall"}), 400
+
+    # Check if a dish with the same name already exists for this dining hall and station
+    existing_dish = Dish.query.filter_by(name=name, dining_hall_id=dining_hall_id, station_id=station_id).first()
+    if existing_dish:
+        return jsonify({"error": "Dish with the same name already exists for this dining hall and station"}), 409
+
+    # Create the new dish
     new_dish = Dish(**data)
     db.session.add(new_dish)
     db.session.commit()
+    
     return jsonify({"id": new_dish.id, "message": "Dish added"}), 201
 
 # GET /api/v1/dishes: Retrieve a list of all dishes
@@ -81,11 +98,21 @@ def get_dishes():
         type: string
         description: Filter by name
         example: "Spaghetti"
-      - name: category
+      - name: description
         in: query
         type: string
-        description: Filter by category
-        example: "Pasta"
+        description: Filter by description
+        example: "pasta"
+      - name: dining_hall_id
+        in: query
+        type: integer
+        description: Filter by dining_hall_id
+        example: 2
+      - name: station_id
+        in: query
+        type: string
+        description: Filter by station_id
+        example: 10
     responses:
       200:
         description: A list of dishes
@@ -102,12 +129,12 @@ def get_dishes():
               description:
                 type: string
                 example: "Classic Italian pasta with egg, cheese, pancetta, and pepper."
-              category:
-                type: string
-                example: "Pasta"
-              dietary_info:
-                type: string
-                example: "Contains dairy and gluten"
+              dining_hall_id:
+                type: integer
+                example: 2
+              station_id:
+                type: integer
+                example: 10
               _links:
                 type: object
                 properties:
@@ -116,13 +143,13 @@ def get_dishes():
                     example: "/api/v1/dishes"
                   self:
                     type: string
-                    example: "/api/v1/dishes/{id}"
+                    example: "/api/v1/dishes/1"
                   delete:
                     type: string
-                    example: "/api/v1/dishes/{id}"
+                    example: "/api/v1/dishes/1"
                   update:
                     type: string
-                    example: "/api/v1/dishes/{id}"
+                    example: "/api/v1/dishes/1"
     """
     name_filter = request.args.get('name')
     description_filter = request.args.get('description')
@@ -171,12 +198,12 @@ def get_dish(id):
             description:
               type: string
               example: "Classic Italian pasta with egg, cheese, pancetta, and pepper."
-            category:
-              type: string
-              example: "Pasta"
-            dietary_info:
-              type: string
-              example: "Contains dairy and gluten"
+            dining_hall_id:
+              type: integer
+              example: 2
+            station_id:
+              type: integer
+              example: 10
             _links:
               type: object
               properties:
@@ -185,13 +212,13 @@ def get_dish(id):
                   example: "/api/v1/dishes"
                 self:
                   type: string
-                  example: "/api/v1/dishes/{id}"
+                  example: "/api/v1/dishes/1"
                 delete:
                   type: string
-                  example: "/api/v1/dishes/{id}"
+                  example: "/api/v1/dishes/1"
                 update:
                   type: string
-                  example: "/api/v1/dishes/{id}"
+                  example: "/api/v1/dishes/1"
       404:
         description: Dish not found
     """
@@ -226,12 +253,14 @@ def update_dish(id):
             description:
               type: string
               example: "Pasta with ground beef in a tomato sauce."
-            category:
-              type: string
-              example: "Pasta"
-            dietary_info:
-              type: string
-              example: "Contains gluten"
+            dining_hall_id:
+              type: integer
+              description: The id of the dining hall
+              example: 2
+            station_id:
+              type: integer
+              description: The id of the station
+              example: 10
     responses:
       200:
         description: Dish updated
