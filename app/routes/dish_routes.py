@@ -65,9 +65,6 @@ def create_dish():
                     method:
                       type: string
                       example: "GET"
-                    rel:
-                      type: string
-                      example: "collection"
                 create:
                   type: object
                   properties:
@@ -77,9 +74,6 @@ def create_dish():
                     method:
                       type: string
                       example: "POST"
-                    rel:
-                      type: string
-                      example: "create"
                 delete:
                   type: object
                   properties:
@@ -89,9 +83,6 @@ def create_dish():
                     method:
                       type: string
                       example: "DELETE"
-                    rel:
-                      type: string
-                      example: "delete"
                 self:
                   type: object
                   properties:
@@ -101,9 +92,6 @@ def create_dish():
                     method:
                       type: string
                       example: "GET"
-                    rel:
-                      type: string
-                      example: "self"
                 update:
                   type: object
                   properties:
@@ -113,9 +101,6 @@ def create_dish():
                     method:
                       type: string
                       example: "PUT"
-                    rel:
-                      type: string
-                      example: "update"
       400:
         description: Invalid input
       409:
@@ -185,7 +170,7 @@ def get_dishes():
             properties:
               id:
                 type: integer
-                example: 1
+                example: 3
               name:
                 type: string
                 example: "Spaghetti Carbonara"
@@ -210,9 +195,6 @@ def get_dishes():
                       method:
                         type: string
                         example: "GET"
-                      rel:
-                        type: string
-                        example: "collection"
                   create:
                     type: object
                     properties:
@@ -222,9 +204,6 @@ def get_dishes():
                       method:
                         type: string
                         example: "POST"
-                      rel:
-                        type: string
-                        example: "create"
                   delete:
                     type: object
                     properties:
@@ -234,9 +213,6 @@ def get_dishes():
                       method:
                         type: string
                         example: "DELETE"
-                      rel:
-                        type: string
-                        example: "delete"
                   self:
                     type: object
                     properties:
@@ -246,9 +222,6 @@ def get_dishes():
                       method:
                         type: string
                         example: "GET"
-                      rel:
-                        type: string
-                        example: "self"
                   update:
                     type: object
                     properties:
@@ -258,9 +231,6 @@ def get_dishes():
                       method:
                         type: string
                         example: "PUT"
-                      rel:
-                        type: string
-                        example: "update"
     """
     name_filter = request.args.get('name')
     description_filter = request.args.get('description')
@@ -327,9 +297,6 @@ def get_dish(id):
                     method:
                       type: string
                       example: "GET"
-                    rel:
-                      type: string
-                      example: "collection"
                 create:
                   type: object
                   properties:
@@ -339,9 +306,6 @@ def get_dish(id):
                     method:
                       type: string
                       example: "POST"
-                    rel:
-                      type: string
-                      example: "create"
                 delete:
                   type: object
                   properties:
@@ -351,9 +315,6 @@ def get_dish(id):
                     method:
                       type: string
                       example: "DELETE"
-                    rel:
-                      type: string
-                      example: "delete"
                 self:
                   type: object
                   properties:
@@ -363,9 +324,6 @@ def get_dish(id):
                     method:
                       type: string
                       example: "GET"
-                    rel:
-                      type: string
-                      example: "self"
                 update:
                   type: object
                   properties:
@@ -375,9 +333,6 @@ def get_dish(id):
                     method:
                       type: string
                       example: "PUT"
-                    rel:
-                      type: string
-                      example: "update"
       404:
         description: Dish not found
     """
@@ -443,9 +398,6 @@ def update_dish(id):
                     method:
                       type: string
                       example: "GET"
-                    rel:
-                      type: string
-                      example: "collection"
                 create:
                   type: object
                   properties:
@@ -455,9 +407,6 @@ def update_dish(id):
                     method:
                       type: string
                       example: "POST"
-                    rel:
-                      type: string
-                      example: "create"
                 delete:
                   type: object
                   properties:
@@ -467,9 +416,6 @@ def update_dish(id):
                     method:
                       type: string
                       example: "DELETE"
-                    rel:
-                      type: string
-                      example: "delete"
                 self:
                   type: object
                   properties:
@@ -479,9 +425,6 @@ def update_dish(id):
                     method:
                       type: string
                       example: "GET"
-                    rel:
-                      type: string
-                      example: "self"
                 update:
                   type: object
                   properties:
@@ -491,9 +434,6 @@ def update_dish(id):
                     method:
                       type: string
                       example: "PUT"
-                    rel:
-                      type: string
-                      example: "update"
       404:
         description: Dish not found
     """
@@ -552,9 +492,6 @@ def delete_dish(id):
                     method:
                       type: string
                       example: "GET"
-                    rel:
-                      type: string
-                      example: "collection"
                 create:
                   type: object
                   properties:
@@ -564,9 +501,6 @@ def delete_dish(id):
                     method:
                       type: string
                       example: "POST"
-                    rel:
-                      type: string
-                      example: "create"
                 delete:
                   type: object
                   properties:
@@ -576,9 +510,6 @@ def delete_dish(id):
                     method:
                       type: string
                       example: "DELETE"
-                    rel:
-                      type: string
-                      example: "delete"
                 self:
                   type: object
                   properties:
@@ -588,9 +519,6 @@ def delete_dish(id):
                     method:
                       type: string
                       example: "GET"
-                    rel:
-                      type: string
-                      example: "self"
                 update:
                   type: object
                   properties:
@@ -600,9 +528,6 @@ def delete_dish(id):
                     method:
                       type: string
                       example: "PUT"
-                    rel:
-                      type: string
-                      example: "update"
       404:
         description: Dish not found
     """

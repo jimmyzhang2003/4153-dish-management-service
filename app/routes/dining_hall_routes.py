@@ -6,12 +6,14 @@ from schemas import DiningHallSchema, StationSchema
 dining_halls_bp = Blueprint('dining_halls', __name__)
 dining_hall_schema = DiningHallSchema()
 dining_halls_schema = DiningHallSchema(many=True)
+station_schema = StationSchema()
+stations_schema = StationSchema(many=True)
 
 # POST: /api/v1/dining_halls: Create a new dining hall
 @dining_halls_bp.route('/dining_halls', methods=['POST'])
 def create_dining_hall():
     """
-    create a new dining hall
+    Create a new dining hall
     ---
     tags:
       - Dining Halls
@@ -35,10 +37,49 @@ def create_dining_hall():
           properties:
             id:
               type: integer
-              example: 1
+              example: 3
             message:
               type: string
               example: "Dining hall created"
+            _links:
+              type: object
+              properties:
+                collection:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dining_halls"
+                    method:
+                      type: string
+                      example: "GET"
+                create:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dining_halls"
+                    method:
+                      type: string
+                      example: "POST"
+                get_stations:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dining_halls/3/stations"
+                    method:
+                      type: string
+                      example: "GET"
+                create_station:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dining_halls/3/stations"
+                    method:
+                      type: string
+                      example: "POST"
       400:
         description: Name is required
       409:
@@ -59,7 +100,7 @@ def create_dining_hall():
     db.session.add(new_dining_hall)
     db.session.commit()
 
-    return jsonify({"id": new_dining_hall.id, "message": "Dining hall created"}), 201
+    return dining_hall_schema.jsonify({"id": new_dining_hall.id, "message": "Dining hall created"}), 201
 
 # GET /api/v1/dining_halls: Retrieve a list of all dining halls
 @dining_halls_bp.route('/dining_halls', methods=['GET'])
@@ -84,22 +125,49 @@ def get_dining_halls():
             properties:
               id:
                 type: integer
-                example: 1
+                example: 3
               name:
                 type: string
                 example: "John Jay"
-              station:
-                type: string
-                example: "Grill"
               _links:
                 type: object
                 properties:
-                  self:
-                    type: string
-                    example: "/api/v1/dining_halls/1"
                   collection:
-                    type: string
-                    example: "/api/v1/dining_halls"
+                    type: object
+                    properties:
+                      href:
+                        type: string
+                        example: "/api/v1/dining_halls"
+                      method:
+                        type: string
+                        example: "GET"
+                  create:
+                    type: object
+                    properties:
+                      href:
+                        type: string
+                        example: "/api/v1/dining_halls"
+                      method:
+                        type: string
+                        example: "POST"
+                  get_stations:
+                    type: object
+                    properties:
+                      href:
+                        type: string
+                        example: "/api/v1/dining_halls/3/stations"
+                      method:
+                        type: string
+                        example: "GET"
+                  create_station:
+                    type: object
+                    properties:
+                      href:
+                        type: string
+                        example: "/api/v1/dining_halls/3/stations"
+                      method:
+                        type: string
+                        example: "POST"
     """
     name_filter = request.args.get('name')
 
@@ -108,19 +176,7 @@ def get_dining_halls():
         query = query.filter(DiningHall.name.like(f"%{name_filter}%"))
 
     dining_halls = query.all()
-    dining_halls_data = [
-        {
-            "id": dh.id,
-            "name": dh.name,
-            "_links": {
-                "self": f"/api/v1/dining_halls/{dh.id}",
-                "collection": "/api/v1/dining_halls"
-            }
-        } for dh in dining_halls
-    ]
-
-    # TODO: change this to dining_hall_schema.jsonify
-    return jsonify(dining_halls_data), 200
+    return dining_halls_schema.jsonify(dining_halls), 200
 
 # GET /api/v1/dining_halls/{id}/stations: Retrieve all the stations within a specific dining hall
 @dining_halls_bp.route('/dining_halls/<int:id>/stations', methods=['GET'])
@@ -157,16 +213,28 @@ def get_stations(id):
                 example: "Grill Station"
               dining_hall_id:
                 type: integer
-                example: 1
+                example: 3
               _links:
                 type: object
                 properties:
-                  self:
-                    type: string
-                    example: "/api/v1/dining_halls/1/stations/1"
-                  dining_hall:
-                    type: string
-                    example: "/api/v1/dining_halls/1"
+                  collection:
+                    type: object
+                    properties:
+                      href:
+                        type: string
+                        example: "/api/v1/dining_halls/3/stations"
+                      method:
+                        type: string
+                        example: "GET"
+                  create:
+                    type: object
+                    properties:
+                      href:
+                        type: string
+                        example: "/api/v1/dining_halls/3/stations"
+                      method:
+                        type: string
+                        example: "POST"
       404:
         description: Dining hall not found
     """
@@ -184,20 +252,7 @@ def get_stations(id):
         query = query.filter(Station.name.like(f"%{name_filter}%"))
 
     stations = query.all()
-    stations_data = [
-        {
-            "id": station.id,
-            "name": station.name,
-            "dining_hall_id": station.dining_hall_id,
-            "_links": {
-                "self": f"/api/v1/dining_halls/{id}/stations/{station.id}",
-                "dining_hall": f"/api/v1/dining_halls/{id}"
-            }
-        } for station in stations
-    ]
-
-    # TODO: change this to station_schema.jsonify
-    return jsonify(stations_data), 200
+    return stations_schema.jsonify(stations), 200
     
 # POST /api/v1/dining_halls/{id}/stations: Create a new station to a particular dining hall
 @dining_halls_bp.route('/dining_halls/<int:id>/stations', methods=['POST'])
@@ -243,6 +298,27 @@ def create_station(id):
             message:
               type: string
               example: "Station created"
+            _links:
+              type: object
+              properties:
+                collection:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dining_halls/2/stations"
+                    method:
+                      type: string
+                      example: "GET"
+                create:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dining_halls/2/stations"
+                    method:
+                      type: string
+                      example: "POST"
       404:
         description: Dining hall not found
       409:
@@ -266,5 +342,4 @@ def create_station(id):
     new_station = Station(name=name, dining_hall_id=id)
     db.session.add(new_station)
     db.session.commit()
-
-    return jsonify({"id": new_station.id, "message": "Station created"}), 201
+    return station_schema.jsonify({"id": new_station.id, "dining_hall_id": id, "message": "Station created"}), 201
