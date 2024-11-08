@@ -7,11 +7,11 @@ dishes_bp = Blueprint('dishes', __name__)
 dish_schema = DishSchema()
 dishes_schema = DishSchema(many=True)
 
-# POST /api/v1/dishes: Add a new dish
+# POST /api/v1/dishes: Create a new dish
 @dishes_bp.route('/dishes', methods=['POST'])
-def add_dish():
+def create_dish():
     """
-    Add a new dish
+    Create a new dish
     ---
     tags:
       - Dishes
@@ -44,15 +44,78 @@ def add_dish():
               example: 10
     responses:
       201:
-        description: Dish added
+        description: Dish created
         schema:
           properties:
             id:
               type: integer
-              example: 1
+              example: 3
             message:
               type: string
-              example: "Dish added"
+              example: "Dish created"
+            _links:
+              type: object
+              properties:
+                collection:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dishes"
+                    method:
+                      type: string
+                      example: "GET"
+                    rel:
+                      type: string
+                      example: "collection"
+                create:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dishes"
+                    method:
+                      type: string
+                      example: "POST"
+                    rel:
+                      type: string
+                      example: "create"
+                delete:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dishes/3"
+                    method:
+                      type: string
+                      example: "DELETE"
+                    rel:
+                      type: string
+                      example: "delete"
+                self:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dishes/3"
+                    method:
+                      type: string
+                      example: "GET"
+                    rel:
+                      type: string
+                      example: "self"
+                update:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dishes/3"
+                    method:
+                      type: string
+                      example: "PUT"
+                    rel:
+                      type: string
+                      example: "update"
       400:
         description: Invalid input
       409:
@@ -79,10 +142,10 @@ def add_dish():
 
     # Create the new dish
     new_dish = Dish(**data)
-    db.session.add(new_dish)
+    db.session.create(new_dish)
     db.session.commit()
     
-    return jsonify({"id": new_dish.id, "message": "Dish added"}), 201
+    return dish_schema.jsonify({"id": new_dish.id, "message": "Dish created"}), 201
 
 # GET /api/v1/dishes: Retrieve a list of all dishes
 @dishes_bp.route('/dishes', methods=['GET'])
@@ -139,17 +202,65 @@ def get_dishes():
                 type: object
                 properties:
                   collection:
-                    type: string
-                    example: "/api/v1/dishes"
-                  self:
-                    type: string
-                    example: "/api/v1/dishes/1"
+                    type: object
+                    properties:
+                      href:
+                        type: string
+                        example: "/api/v1/dishes"
+                      method:
+                        type: string
+                        example: "GET"
+                      rel:
+                        type: string
+                        example: "collection"
+                  create:
+                    type: object
+                    properties:
+                      href:
+                        type: string
+                        example: "/api/v1/dishes"
+                      method:
+                        type: string
+                        example: "POST"
+                      rel:
+                        type: string
+                        example: "create"
                   delete:
-                    type: string
-                    example: "/api/v1/dishes/1"
+                    type: object
+                    properties:
+                      href:
+                        type: string
+                        example: "/api/v1/dishes/3"
+                      method:
+                        type: string
+                        example: "DELETE"
+                      rel:
+                        type: string
+                        example: "delete"
+                  self:
+                    type: object
+                    properties:
+                      href:
+                        type: string
+                        example: "/api/v1/dishes/3"
+                      method:
+                        type: string
+                        example: "GET"
+                      rel:
+                        type: string
+                        example: "self"
                   update:
-                    type: string
-                    example: "/api/v1/dishes/1"
+                    type: object
+                    properties:
+                      href:
+                        type: string
+                        example: "/api/v1/dishes/3"
+                      method:
+                        type: string
+                        example: "PUT"
+                      rel:
+                        type: string
+                        example: "update"
     """
     name_filter = request.args.get('name')
     description_filter = request.args.get('description')
@@ -208,17 +319,65 @@ def get_dish(id):
               type: object
               properties:
                 collection:
-                  type: string
-                  example: "/api/v1/dishes"
-                self:
-                  type: string
-                  example: "/api/v1/dishes/1"
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dishes"
+                    method:
+                      type: string
+                      example: "GET"
+                    rel:
+                      type: string
+                      example: "collection"
+                create:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dishes"
+                    method:
+                      type: string
+                      example: "POST"
+                    rel:
+                      type: string
+                      example: "create"
                 delete:
-                  type: string
-                  example: "/api/v1/dishes/1"
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dishes/3"
+                    method:
+                      type: string
+                      example: "DELETE"
+                    rel:
+                      type: string
+                      example: "delete"
+                self:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dishes/3"
+                    method:
+                      type: string
+                      example: "GET"
+                    rel:
+                      type: string
+                      example: "self"
                 update:
-                  type: string
-                  example: "/api/v1/dishes/1"
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dishes/3"
+                    method:
+                      type: string
+                      example: "PUT"
+                    rel:
+                      type: string
+                      example: "update"
       404:
         description: Dish not found
     """
@@ -266,9 +425,75 @@ def update_dish(id):
         description: Dish updated
         schema:
           properties:
+            id:
+              type: integer
+              example: 3
             message:
               type: string
               example: "Dish updated"
+            _links:
+              type: object
+              properties:
+                collection:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dishes"
+                    method:
+                      type: string
+                      example: "GET"
+                    rel:
+                      type: string
+                      example: "collection"
+                create:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dishes"
+                    method:
+                      type: string
+                      example: "POST"
+                    rel:
+                      type: string
+                      example: "create"
+                delete:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dishes/3"
+                    method:
+                      type: string
+                      example: "DELETE"
+                    rel:
+                      type: string
+                      example: "delete"
+                self:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dishes/3"
+                    method:
+                      type: string
+                      example: "GET"
+                    rel:
+                      type: string
+                      example: "self"
+                update:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dishes/3"
+                    method:
+                      type: string
+                      example: "PUT"
+                    rel:
+                      type: string
+                      example: "update"
       404:
         description: Dish not found
     """
@@ -287,7 +512,7 @@ def update_dish(id):
     if 'dining_hall_id' in updated_data:
         dish.dining_hall_id = updated_data['dining_hall_id']
     db.session.commit()
-    return jsonify({"message": "Dish updated"}), 200
+    return dish_schema.jsonify({"id": dish.id, "message": "Dish updated"}), 200
 
 # DELETE /api/v1/dishes/{id}: Delete a dish
 @dishes_bp.route('/dishes/<int:id>', methods=['DELETE'])
@@ -309,9 +534,75 @@ def delete_dish(id):
         description: Dish deleted
         schema:
           properties:
+            id:
+              type: integer
+              example: 3
             message:
               type: string
               example: "Dish deleted"
+            _links:
+              type: object
+              properties:
+                collection:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dishes"
+                    method:
+                      type: string
+                      example: "GET"
+                    rel:
+                      type: string
+                      example: "collection"
+                create:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dishes"
+                    method:
+                      type: string
+                      example: "POST"
+                    rel:
+                      type: string
+                      example: "create"
+                delete:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dishes/3"
+                    method:
+                      type: string
+                      example: "DELETE"
+                    rel:
+                      type: string
+                      example: "delete"
+                self:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dishes/3"
+                    method:
+                      type: string
+                      example: "GET"
+                    rel:
+                      type: string
+                      example: "self"
+                update:
+                  type: object
+                  properties:
+                    href:
+                      type: string
+                      example: "/api/v1/dishes/3"
+                    method:
+                      type: string
+                      example: "PUT"
+                    rel:
+                      type: string
+                      example: "update"
       404:
         description: Dish not found
     """
@@ -320,4 +611,4 @@ def delete_dish(id):
         return jsonify({"error": "Dish not found"}), 404
     db.session.delete(dish)
     db.session.commit()
-    return jsonify({"message": "Dish deleted"}), 200
+    return dish_schema.jsonify({"id": dish.id, "message": "Dish deleted"}), 200

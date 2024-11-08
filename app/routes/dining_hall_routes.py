@@ -7,11 +7,11 @@ dining_halls_bp = Blueprint('dining_halls', __name__)
 dining_hall_schema = DiningHallSchema()
 dining_halls_schema = DiningHallSchema(many=True)
 
-# POST: /api/v1/dining_halls: Add a new dining hall
+# POST: /api/v1/dining_halls: Create a new dining hall
 @dining_halls_bp.route('/dining_halls', methods=['POST'])
-def add_dining_hall():
+def create_dining_hall():
     """
-    Add a new dining hall
+    create a new dining hall
     ---
     tags:
       - Dining Halls
@@ -30,7 +30,7 @@ def add_dining_hall():
               example: "John Jay"
     responses:
       201:
-        description: Dining hall added
+        description: Dining hall created
         schema:
           properties:
             id:
@@ -38,7 +38,7 @@ def add_dining_hall():
               example: 1
             message:
               type: string
-              example: "Dining hall added"
+              example: "Dining hall created"
       400:
         description: Name is required
       409:
@@ -59,7 +59,7 @@ def add_dining_hall():
     db.session.add(new_dining_hall)
     db.session.commit()
 
-    return jsonify({"id": new_dining_hall.id, "message": "Dining hall added"}), 201
+    return jsonify({"id": new_dining_hall.id, "message": "Dining hall created"}), 201
 
 # GET /api/v1/dining_halls: Retrieve a list of all dining halls
 @dining_halls_bp.route('/dining_halls', methods=['GET'])
@@ -199,11 +199,11 @@ def get_stations(id):
     # TODO: change this to station_schema.jsonify
     return jsonify(stations_data), 200
     
-# POST /api/v1/dining_halls/{id}/stations: Add a new station to a particular dining hall
+# POST /api/v1/dining_halls/{id}/stations: Create a new station to a particular dining hall
 @dining_halls_bp.route('/dining_halls/<int:id>/stations', methods=['POST'])
-def add_station(id):
+def create_station(id):
     """
-    Add a new station to a specific dining hall
+    Create a new station to a specific dining hall
     ---
     tags:
       - Dining Halls
@@ -242,7 +242,7 @@ def add_station(id):
               example: 5
             message:
               type: string
-              example: "Station added"
+              example: "Station created"
       404:
         description: Dining hall not found
       409:
@@ -267,4 +267,4 @@ def add_station(id):
     db.session.add(new_station)
     db.session.commit()
 
-    return jsonify({"id": new_station.id, "message": "Station added"}), 201
+    return jsonify({"id": new_station.id, "message": "Station created"}), 201
