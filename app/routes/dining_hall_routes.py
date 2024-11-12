@@ -178,6 +178,43 @@ def get_dining_halls():
     dining_halls = query.all()
     return dining_halls_schema.jsonify(dining_halls), 200
 
+# DELETE /api/v1/dining_halls/{id}: Delete a dining hall
+@dining_halls_bp.route('/dining_halls/<int:id>', methods=['DELETE'])
+def delete_dining_hall(id):
+    """
+    Delete a dining hall by ID
+    ---
+    tags:
+      - Dining Halls
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        description: The ID of the dining hall to delete
+    responses:
+      200:
+        description: Dining hall deleted
+        schema:
+          properties:
+            id:
+              type: integer
+              example: 3
+            message:
+              type: string
+              example: "Dining hall deleted"
+      404:
+        description: Dining hall not found
+    """
+    dining_hall = DiningHall.query.get(id)
+    if not dining_hall:
+        return jsonify({"error": "Dining hall not found"}), 404
+
+    db.session.delete(dining_hall)
+    db.session.commit()
+
+    return dining_hall_schema.jsonify({"id": dining_hall.id, "message": "Dining hall deleted"}), 200
+
 # GET /api/v1/dining_halls/{id}/stations: Retrieve all the stations within a specific dining hall
 @dining_halls_bp.route('/dining_halls/<int:id>/stations', methods=['GET'])
 def get_stations(id):
@@ -275,17 +312,12 @@ def create_station(id):
         schema:
           id: Station
           required:
-            - dining_hall_id
             - name
           properties:
             name:
               type: string
               description: The name of the new station
               example: "Grill Station"
-            dining_hall_id:
-              type: integer
-              description: The id of the dining hall
-              example: 2
     responses:
       201:
         description: Station created successfully
@@ -343,3 +375,56 @@ def create_station(id):
     db.session.add(new_station)
     db.session.commit()
     return station_schema.jsonify({"id": new_station.id, "dining_hall_id": id, "message": "Station created"}), 201
+
+# DELETE /api/v1/dining_halls/{id}/stations/{station_id}: Delete a station within a specific dining hall
+@dining_halls_bp.route('/dining_halls/<int:id>/stations/<int:station_id>', methods=['DELETE'])
+def delete_station(id, station_id):
+    """
+    Delete a station within a specific dining hall
+    ---
+    tags:
+      - Dining Halls
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: integer
+        description: ID of the dining hall
+      - name: station_id
+        in: path
+        required: true
+        type: integer
+        description: ID of the station to delete
+    responses:
+      200:
+        description: Station deleted
+        schema:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 10
+            dining_hall_id:
+              type: integer
+              example: 3
+            message:
+              type: string
+              example: "Station deleted"
+      404:
+        description: Dining hall or station not found
+    """
+    # Verify that the dining hall exists
+    dining_hall = DiningHall.query.get(id)
+    if not dining_hall:
+        return jsonify({"error": "Dining hall not found"}), 404
+
+    # Find the station to delete within the specified dining hall
+    station = Station.query.filter_by(id=station_id, dining_hall_id=id).first()
+    if not station:
+        return jsonify({"error": "Station not found"}), 404
+
+    # Delete the station
+    db.session.delete(station)
+    db.session.commit()
+
+    return station_schema.jsonify({"id": station_id, "dining_hall_id": id, "message": "Station deleted"}), 200

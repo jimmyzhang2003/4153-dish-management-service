@@ -127,7 +127,7 @@ def create_dish():
 
     # Create the new dish
     new_dish = Dish(**data)
-    db.session.create(new_dish)
+    db.session.add(new_dish)
     db.session.commit()
     
     return dish_schema.jsonify({"id": new_dish.id, "message": "Dish created"}), 201
