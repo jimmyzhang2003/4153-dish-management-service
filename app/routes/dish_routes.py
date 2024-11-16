@@ -161,6 +161,11 @@ def get_dishes():
         type: string
         description: Filter by station_id
         example: 10
+      - name: limit
+        in: query
+        type: integer
+        description: Limit on the number of dishes returned (default 10)
+        example: 5
     responses:
       200:
         description: A list of dishes
@@ -237,6 +242,9 @@ def get_dishes():
     dining_hall_filter = request.args.get('dining_hall_id')
     station_filter = request.args.get('station_id')
 
+    # set limit to 10 if not specified
+    limit = request.args.get('limit', default=10, type=int)
+
     query = db.session.query(Dish)
     if name_filter:
         query = query.filter(Dish.name.like(f"%{name_filter}%"))
@@ -247,7 +255,7 @@ def get_dishes():
     if station_filter:
         query = query.filter(Dish.station_id == station_filter)
     
-    dishes = query.all()
+    dishes = query.limit(limit).all()
     return dishes_schema.jsonify(dishes), 200
 
 # GET /api/v1/dishes/{id}: Retrieve dish details

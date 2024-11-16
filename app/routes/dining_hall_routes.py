@@ -215,6 +215,67 @@ def delete_dining_hall(id):
 
     return dining_hall_schema.jsonify({"id": dining_hall.id, "message": "Dining hall deleted"}), 200
 
+# GET /api/v1/stations: Retrieve a list of all stations
+@dining_halls_bp.route('/stations', methods=['GET'])
+def get_all_stations():
+    """
+    Retrieve a list of all stations
+    ---
+    tags:
+      - Dining Halls
+    parameters:
+      - name: name
+        in: query
+        type: string
+        description: Filter by station name
+        example: "Grill"
+    responses:
+      200:
+        description: A list of all stations
+        schema:
+          type: array
+          items:
+            properties:
+              id:
+                type: integer
+                example: 3
+              name:
+                type: string
+                example: "Grill Station"
+              dining_hall_id:
+                type: integer
+                example: 2
+              _links:
+                type: object
+                properties:
+                  collection:
+                    type: object
+                    properties:
+                      href:
+                        type: string
+                        example: "/api/v1/dining_halls/3/stations"
+                      method:
+                        type: string
+                        example: "GET"
+                  create:
+                    type: object
+                    properties:
+                      href:
+                        type: string
+                        example: "/api/v1/dining_halls/3/stations"
+                      method:
+                        type: string
+                        example: "POST"
+    """
+    name_filter = request.args.get('name')
+
+    query = db.session.query(Station)
+    if name_filter:
+        query = query.filter(Station.name.like(f"%{name_filter}%"))
+
+    stations = query.all()
+    return stations_schema.jsonify(stations), 200
+
 # GET /api/v1/dining_halls/{id}/stations: Retrieve all the stations within a specific dining hall
 @dining_halls_bp.route('/dining_halls/<int:id>/stations', methods=['GET'])
 def get_stations(id):
