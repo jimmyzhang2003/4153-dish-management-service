@@ -87,6 +87,10 @@ class StationSchema(ma.SQLAlchemySchema):
 
     # HATEOAS links
     _links = ma.Hyperlinks({
+        "full_collection": {
+            "href": ma.URLFor("dining_halls.get_all_stations"),
+            "method": "GET"
+        },
         "collection": {
             "href": ma.URLFor("dining_halls.get_stations", values=dict(id="<dining_hall_id>")),
             "method": "GET"
