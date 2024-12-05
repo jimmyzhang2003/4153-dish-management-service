@@ -9,7 +9,7 @@ COPY ./requirements.txt /src
 COPY ./app /src
 
 # Upgrade pip and install Python dependencies
-RUN pip3 install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+RUN pip3 install --upgrade pip && pip install --no-cache-dir -r requirements.txt --use-deprecated=legacy-resolver
 
 # Expose port 5001 for the app
 EXPOSE 5001
