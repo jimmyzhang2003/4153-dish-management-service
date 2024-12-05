@@ -7,6 +7,7 @@ from middleware import before_request_logging, after_request_logging
 from routes.dish_routes import dishes_bp
 from routes.dining_hall_routes import dining_halls_bp
 from routes.redirect_routes import redirect_bp
+from routes.graphql_routes import graphql_bp
 
 # Create Flask app
 app = Flask(__name__)
@@ -40,6 +41,7 @@ app.after_request(after_request_logging)
 app.register_blueprint(dishes_bp, url_prefix="/api/v1")
 app.register_blueprint(dining_halls_bp, url_prefix="/api/v1")
 app.register_blueprint(redirect_bp)
+app.register_blueprint(graphql_bp)
 
 if __name__ == '__main__':
    app.run(host='0.0.0.0', port=5001)
