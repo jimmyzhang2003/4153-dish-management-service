@@ -41,4 +41,11 @@ jobs:
           sudo docker pull ${{ secrets.DOCKER_USERNAME }}/4153-dish-management-service:latest
           sudo docker stop flask-container || true
           sudo docker rm flask-container || true
-          sudo docker run -d --name flask-container -p 5001:5001 ${{ secrets.DOCKER_USERNAME }}/4153-dish-management-service:latest
+          sudo docker run -d --name flask-container -p 5001:5001 \
+            -e DB_ENGINE=${{ secrets.DB_ENGINE }} \
+            -e DB_USER=${{ secrets.DB_USER }} \
+            -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            -e DB_HOST=${{ secrets.DB_HOST }} \
+            -e DB_PORT=${{ secrets.DB_PORT }}
+            -e DB_NAME=${{ secrets.DB_NAME }} \
+            ${{ secrets.DOCKER_USERNAME }}/4153-dish-management-service:latest
