@@ -22,13 +22,13 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Build Docker image
-      run: docker build -t flask-app:latest .
+      run: docker build -t 4153-dish-management-service:latest .
 
     - name: Tag Docker image
-      run: docker tag flask-app:latest my-dockerhub-username/flask-app:latest
+      run: docker tag 4153-dish-management-service:latest ${{ secrets.DOCKER_USERNAME }}/4153-dish-management-service:latest
 
     - name: Push Docker image to DockerHub
-      run: docker push my-dockerhub-username/flask-app:latest
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/4153-dish-management-service:latest
 
     # Deploy to EC2
     - name: Deploy to EC2
@@ -38,7 +38,7 @@ jobs:
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_KEY }}
         script: |
-          docker pull my-dockerhub-username/flask-app:latest
+          docker pull ${{ secrets.DOCKER_USERNAME }}/4153-dish-management-service:latest
           docker stop flask-container || true
           docker rm flask-container || true
-          docker run -d --name flask-container -p 80:5000 my-dockerhub-username/flask-app:latest
+          docker run -d --name flask-container -p 80:5000 ${{ secrets.DOCKER_USERNAME }}/4153-dish-management-service:latest
