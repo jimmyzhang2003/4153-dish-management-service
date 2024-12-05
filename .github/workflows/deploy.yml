@@ -1,0 +1,44 @@
+name: Deploy Service to AWS on Docker
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Set up Docker
+    - name: Log in to DockerHub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build Docker image
+      run: docker build -t flask-app:latest .
+
+    - name: Tag Docker image
+      run: docker tag flask-app:latest my-dockerhub-username/flask-app:latest
+
+    - name: Push Docker image to DockerHub
+      run: docker push my-dockerhub-username/flask-app:latest
+
+    # Deploy to EC2
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@v0.1.4
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_KEY }}
+        script: |
+          docker pull my-dockerhub-username/flask-app:latest
+          docker stop flask-container || true
+          docker rm flask-container || true
+          docker run -d --name flask-container -p 80:5000 my-dockerhub-username/flask-app:latest
